@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  email     String    @unique
+  role      String
+  hash      String
+
+  crops     Crop[]
+  orders    Order[]
+
+  @@map(name: "users")
+}
+
+model Crop {
+  id               Int       @id @default(autoincrement())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  cropName         String
+  cropType         String
+  plantingDate     String
+  harvestingDate   String
+  price            String
+
+  orders           Order[]
+
+  userId           Int
+
+  user             User      @relation(fields: [userId], references: [id])
+
+  @@map(name: "crops")
+}
+
+model Order {
+  id               Int       @id @default(autoincrement())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  quantity         Int
+  crop             Crop      @relation(fields: [cropId], references: [id])
+  cropId           Int
+  cropName         String
+  cropType         String
+  price            Int
+  user             User      @relation(fields: [userId], references: [id])
+  userId           Int
+
+  @@map(name: "orders")
+}
